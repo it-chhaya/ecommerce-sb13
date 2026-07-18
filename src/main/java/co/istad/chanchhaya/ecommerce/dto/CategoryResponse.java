@@ -6,7 +6,7 @@ import lombok.Builder;
 @Builder
 public record CategoryResponse(
         Integer id,
-        String name,
+        String cateName,
         String icon,
         String description,
         @JsonInclude(JsonInclude.Include.NON_NULL)

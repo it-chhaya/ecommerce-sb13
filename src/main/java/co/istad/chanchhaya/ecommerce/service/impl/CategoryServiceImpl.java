@@ -31,10 +31,8 @@ public class CategoryServiceImpl implements CategoryService {
             System.out.println("Category already exists");
         }
 
-        Category newCategory = new Category();
-        newCategory.setName(createCategoryRequest.name());
-        newCategory.setIcon(createCategoryRequest.icon());
-        newCategory.setDescription(createCategoryRequest.description());
+        Category newCategory = categoryMapper
+                .mapCreateCategoryRequestToCategory(createCategoryRequest);
         newCategory.setIsDeleted(false);
 
         // Validate parent category id

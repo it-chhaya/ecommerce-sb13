@@ -1,30 +1,19 @@
 package co.istad.chanchhaya.ecommerce.mapper;
 
 import co.istad.chanchhaya.ecommerce.dto.CategoryResponse;
+import co.istad.chanchhaya.ecommerce.dto.CreateCategoryRequest;
 import co.istad.chanchhaya.ecommerce.entity.Category;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class CategoryMapper {
+@Mapper(componentModel = "spring")
+public interface CategoryMapper {
 
-    public CategoryResponse mapCategoryToCategoryResponse(Category category) {
-        return CategoryResponse.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .icon(category.getIcon())
-                .description(category.getDescription())
-                .parentCategory(mapParentCategoryToCategoryResponse(category.getParentCategory()))
-                .build();
-    }
+    // What is Source? => Parameter
+    // What is Target? => Return
+    Category mapCreateCategoryRequestToCategory(CreateCategoryRequest createCategoryRequest);
 
-    public CategoryResponse mapParentCategoryToCategoryResponse(Category category) {
-        return category != null ?
-                CategoryResponse.builder()
-                        .id(category.getId())
-                        .name(category.getName())
-                        .icon(category.getIcon())
-                        .description(category.getDescription())
-                        .build() : null;
-    }
+    @Mapping(source = "name", target = "cateName")
+    CategoryResponse mapCategoryToCategoryResponse(Category category);
 
 }
