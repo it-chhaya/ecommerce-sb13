@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 public class CategoryMapper {
 
     public CategoryResponse mapCategoryToCategoryResponse(Category category) {
-
         return CategoryResponse.builder()
                 .id(category.getId())
                 .name(category.getName())
@@ -19,13 +18,13 @@ public class CategoryMapper {
     }
 
     public CategoryResponse mapParentCategoryToCategoryResponse(Category category) {
-
-        return CategoryResponse.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .icon(category.getIcon())
-                .description(category.getDescription())
-                .build();
+        return category != null ?
+                CategoryResponse.builder()
+                        .id(category.getId())
+                        .name(category.getName())
+                        .icon(category.getIcon())
+                        .description(category.getDescription())
+                        .build() : null;
     }
 
 }

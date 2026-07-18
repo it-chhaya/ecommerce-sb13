@@ -57,12 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
         List<Category> categories = categoryRepository.findAll();
         // បំលែង entity ទៅជា DTO
         return categories.stream()
-                .map(category -> CategoryResponse.builder()
-                        .id(category.getId())
-                        .name(category.getName())
-                        .icon(category.getIcon())
-                        .description(category.getDescription())
-                        .build())
+                .map(categoryMapper::mapCategoryToCategoryResponse)
                 .toList();
     }
 
