@@ -2,6 +2,8 @@ package co.istad.chanchhaya.ecommerce.service;
 
 import co.istad.chanchhaya.ecommerce.dto.CategoryResponse;
 import co.istad.chanchhaya.ecommerce.dto.CreateCategoryRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,9 +19,9 @@ public interface CategoryService {
 
 
     /**
-     * ទាញព័ត៌មាន category ទាំងអស់
+     * ទាញព័ត៌មាន category តាមរយៈ pagination
      * @return សំណុំនៃ CategoryResponse
      */
-    List<CategoryResponse> findAll();
+    Page<CategoryResponse> findAll(Pageable pageable);
 
 }

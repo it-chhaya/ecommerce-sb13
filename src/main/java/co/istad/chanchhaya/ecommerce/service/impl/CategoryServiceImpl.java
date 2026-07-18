@@ -7,6 +7,9 @@ import co.istad.chanchhaya.ecommerce.mapper.CategoryMapper;
 import co.istad.chanchhaya.ecommerce.repository.CategoryRepository;
 import co.istad.chanchhaya.ecommerce.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,13 +53,11 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public List<CategoryResponse> findAll() {
+    public Page<CategoryResponse> findAll(Pageable pageable) {
         // ទាញយកទិន្នន័យចេញពី database
-        List<Category> categories = categoryRepository.findAll();
+        Page<Category> categories = categoryRepository.findAll(pageable);
         // បំលែង entity ទៅជា DTO
-        return categories.stream()
-                .map(categoryMapper::mapCategoryToCategoryResponse)
-                .toList();
+        return categories.map(categoryMapper::mapCategoryToCategoryResponse);
     }
 
 }
