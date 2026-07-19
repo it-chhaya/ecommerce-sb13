@@ -21,6 +21,12 @@ public class CategoryController {
     private final CategoryService categoryService;
 
 
+    @GetMapping("/{id}")
+    public CategoryResponse findById(@PathVariable Integer id) {
+        return categoryService.findById(id);
+    }
+
+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Integer id) {

@@ -11,6 +11,9 @@ import java.util.List;
 public interface CategoryService {
 
 
+    CategoryResponse findById(Integer id);
+
+
     void deleteById(Integer id);
 
 

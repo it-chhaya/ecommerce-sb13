@@ -28,6 +28,19 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
+    public CategoryResponse findById(Integer id) {
+        return categoryRepository.findById(id)
+                .map(categoryMapper::mapCategoryToCategoryResponse)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Category has not been found"
+                        )
+                );
+    }
+
+
+    @Override
     public void deleteById(Integer id) {
         // Validate category ID
         Category category = categoryRepository.findById(id)
