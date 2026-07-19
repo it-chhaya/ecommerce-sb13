@@ -21,6 +21,13 @@ public class CategoryController {
     private final CategoryService categoryService;
 
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable Integer id) {
+        categoryService.deleteById(id);
+    }
+
+
     @PutMapping("/{id}")
     public CategoryResponse updateById(@PathVariable Integer id,
                                        @Valid @RequestBody UpdateCategoryRequest updateCategoryRequest) {

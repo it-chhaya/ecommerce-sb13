@@ -11,6 +11,9 @@ import java.util.List;
 public interface CategoryService {
 
 
+    void deleteById(Integer id);
+
+
     /**
      * កែប្រែព័ត៌មាន category តាមរយៈ id
      * @param id គឺតំណាង category

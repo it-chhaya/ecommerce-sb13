@@ -1,5 +1,6 @@
 package co.istad.chanchhaya.ecommerce.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -17,6 +18,18 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalAppException {
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ApiErrorResponse<?> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        return ApiErrorResponse.builder()
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .isSuccess(false)
+                .message("Something went wrong")
+                .timestamp(Instant.now())
+                .errorDetail(e.getLocalizedMessage())
+                .build();
+    }
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<?> handleServiceException(ResponseStatusException e) {
