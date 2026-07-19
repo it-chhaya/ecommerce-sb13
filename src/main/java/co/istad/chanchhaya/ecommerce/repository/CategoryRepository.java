@@ -12,4 +12,7 @@ public interface CategoryRepository extends JpaRepository<Category,Integer> {
     // Derived Query Method - DQM
     Optional<Category> findByName(String name);
 
+    // SELECT EXISTS(SELECT * FROM categories WHERE name = :name);
+    boolean existsByName(String name);
+
 }

@@ -2,6 +2,7 @@ package co.istad.chanchhaya.ecommerce.controller;
 
 import co.istad.chanchhaya.ecommerce.dto.CategoryResponse;
 import co.istad.chanchhaya.ecommerce.dto.CreateCategoryRequest;
+import co.istad.chanchhaya.ecommerce.dto.UpdateCategoryRequest;
 import co.istad.chanchhaya.ecommerce.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,14 @@ import org.springframework.web.bind.annotation.*;
 public class CategoryController {
 
     private final CategoryService categoryService;
+
+
+    @PutMapping("/{id}")
+    public CategoryResponse updateById(@PathVariable Integer id,
+                                       @Valid @RequestBody UpdateCategoryRequest updateCategoryRequest) {
+        return categoryService.updateById(id, updateCategoryRequest);
+    }
+
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping

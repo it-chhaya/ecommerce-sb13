@@ -2,6 +2,7 @@ package co.istad.chanchhaya.ecommerce.service.impl;
 
 import co.istad.chanchhaya.ecommerce.dto.CategoryResponse;
 import co.istad.chanchhaya.ecommerce.dto.CreateCategoryRequest;
+import co.istad.chanchhaya.ecommerce.dto.UpdateCategoryRequest;
 import co.istad.chanchhaya.ecommerce.entity.Category;
 import co.istad.chanchhaya.ecommerce.mapper.CategoryMapper;
 import co.istad.chanchhaya.ecommerce.repository.CategoryRepository;
@@ -24,6 +25,32 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     private final CategoryMapper categoryMapper;
+
+
+    @Override
+    public CategoryResponse updateById(Integer id, UpdateCategoryRequest updateCategoryRequest) {
+        // TODO:
+        // Validate category ID
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Category has not been found"
+                        )
+                );
+
+        // Validate category name (prevent duplicated name)
+        if (categoryRepository.existsByName(updateCategoryRequest.name())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Category already exists");
+        }
+
+        categoryMapper.toEntity(updateCategoryRequest, category);
+        category = categoryRepository.save(category);
+
+        return categoryMapper.mapCategoryToCategoryResponse(category);
+    }
 
 
     @Override
