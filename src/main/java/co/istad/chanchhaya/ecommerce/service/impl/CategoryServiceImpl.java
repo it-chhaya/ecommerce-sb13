@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +34,10 @@ public class CategoryServiceImpl implements CategoryService {
         Optional<Category> category = categoryRepository.findByName(createCategoryRequest.name());
 
         if (category.isPresent()) {
-            System.out.println("Category already exists");
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Category name already exists"
+            );
         }
 
         Category newCategory = categoryMapper
@@ -43,7 +48,10 @@ public class CategoryServiceImpl implements CategoryService {
         if (createCategoryRequest.parentCategoryId() != null) {
             Category parentCategory = categoryRepository
                     .findById(createCategoryRequest.parentCategoryId())
-                    .orElseThrow();
+                    .orElseThrow(
+                            () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                    "Parent category not found")
+                    );
             newCategory.setParentCategory(parentCategory);
         }
 
