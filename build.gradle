@@ -19,6 +19,9 @@ repositories {
 
 dependencies {
 
+	// Validation dependency
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 	// MapStruct dependency
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
