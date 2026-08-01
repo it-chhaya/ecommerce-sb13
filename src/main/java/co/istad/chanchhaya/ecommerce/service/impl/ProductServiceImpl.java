@@ -41,7 +41,8 @@ public class ProductServiceImpl implements ProductService {
         // Validate product ID
         Product validProduct = productRepository
                 .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product has not been found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Product has not been found"));
 
         // Validate category ID if client patch
         if (patchProductRequest.categoryId() != null) {
@@ -63,8 +64,10 @@ public class ProductServiceImpl implements ProductService {
                                     HttpStatus.NOT_FOUND,
                                     "Tag ID = " + tagId + "has not been found"
                             )))
-                    .toList();
+                    .collect(Collectors.toList());
             validProduct.setTags(validTags);
+            // List.of(1,2)
+            // List.of(3)
         }
 
         productMapper.toEntity(patchProductRequest, validProduct);
