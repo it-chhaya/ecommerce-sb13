@@ -67,18 +67,19 @@ public class MediaServiceImpl implements MediaService {
         media.setIsDraft(false);
         media = mediaRepository.save(media);
 
-        // 1MB = 1_000_000B
-        Float sizeAsMb = media.getSize() / 1_000_000;
+        return buildMediaResponse(media);
+    }
 
+    private MediaResponse buildMediaResponse(Media media) {
+        // 1MB = 1_000_000B
         return MediaResponse.builder()
                 .id(media.getId())
                 .name(media.getName())
                 .extension(media.getExtension())
                 .mediaType(media.getMediaType())
-                .size(sizeAsMb)
+                .size(media.getSize() / 1_000_000)
                 .measurement(MB)
-                // http://localhost:1333/media/78689a24-551c-4575-9831-a4ec8e2bb0ef.png
-                .uri(buildMediaUri(media))
+                .uri(buildMediaUri(media)) // http://localhost:1333/media/78689a24-551c-4575-9831-a4ec8e2bb0ef.png
                 .build();
     }
 
