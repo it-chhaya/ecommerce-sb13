@@ -28,6 +28,12 @@ public class MediaServiceImpl implements MediaService {
     @Value("${media.location}")
     private String mediaLocation;
 
+    @Value("${media.client-path}")
+    private String mediaClientPath;
+
+    @Value("${media.base-uri}")
+    private String mediaBaseUri;
+
     private final static String MB = "MB";
 
     @Override
@@ -71,7 +77,16 @@ public class MediaServiceImpl implements MediaService {
                 .mediaType(media.getMediaType())
                 .size(sizeAsMb)
                 .measurement(MB)
+                // http://localhost:1333/media/78689a24-551c-4575-9831-a4ec8e2bb0ef.png
+                .uri(buildMediaUri(media))
                 .build();
+    }
+
+    private String buildMediaUri(Media media) {
+        return mediaBaseUri +
+                mediaClientPath +
+                "/" + media.getName() +
+                "." + media.getExtension();
     }
 
 }

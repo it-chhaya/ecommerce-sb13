@@ -9,6 +9,7 @@ public record MediaResponse(
         String extension,
         String mediaType,
         Float size, // convert from BYTE to MB
-        String measurement // MB
+        String measurement, // MB
+        String uri
 ) {
 }
