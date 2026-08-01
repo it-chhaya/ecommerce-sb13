@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -35,6 +36,15 @@ public class MediaServiceImpl implements MediaService {
     private String mediaBaseUri;
 
     private final static String MB = "MB";
+
+
+    @Override
+    public List<MediaResponse> upload(List<MultipartFile> files) {
+        return files.stream()
+                .map(this::upload) // invoke upload (single)
+                .toList();
+    }
+
 
     @Override
     public MediaResponse upload(MultipartFile file) {
