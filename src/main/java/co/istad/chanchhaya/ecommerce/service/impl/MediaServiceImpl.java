@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -42,6 +43,7 @@ public class MediaServiceImpl implements MediaService {
     private final static String MB = "MB";
 
 
+    @Transactional
     @Override
     public void deleteByName(String name) {
         Media media = mediaRepository.findByName(name)
@@ -55,7 +57,7 @@ public class MediaServiceImpl implements MediaService {
         mediaRepository.delete(media);
 
         // Delete from file system
-        Path path = Paths.get(buildMediaPath(mediaLocation, media.getName(), media.getExtension()));
+        Path path = Paths.get(buildMediaPath(media.getName(), media.getExtension()));
         try {
             Files.delete(path);
         } catch (IOException e) {
@@ -106,7 +108,7 @@ public class MediaServiceImpl implements MediaService {
         // e.g. Vital.png
         int lastIndexDot = file.getOriginalFilename().lastIndexOf('.');
         String extension = file.getOriginalFilename().substring(lastIndexDot + 1);
-        Path path = Paths.get(buildMediaPath(mediaLocation, name, extension));
+        Path path = Paths.get(buildMediaPath(name, extension));
         log.info("Uploading media location: {}", path);
 
         // 2. Copy file
@@ -152,9 +154,7 @@ public class MediaServiceImpl implements MediaService {
                 "." + media.getExtension();
     }
 
-    private String buildMediaPath(String mediaLocation,
-                                  String mediaName,
-                                  String mediaExtension) {
+    private String buildMediaPath(String mediaName, String mediaExtension) {
         return mediaLocation + mediaName + "." + mediaExtension;
     }
 
