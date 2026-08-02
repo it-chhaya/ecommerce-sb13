@@ -39,6 +39,18 @@ public class MediaServiceImpl implements MediaService {
 
 
     @Override
+    public MediaResponse findByName(String name) {
+        Media media = mediaRepository.findByName(name)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Media has not been found"
+                        ));
+        return buildMediaResponse(media);
+    }
+
+
+    @Override
     public List<MediaResponse> upload(List<MultipartFile> files) {
         return files.stream()
                 .map(this::upload) // invoke upload (single)

@@ -16,6 +16,13 @@ public class MediaController {
 
     private final MediaService mediaService;
 
+
+    @GetMapping("/{name}")
+    public MediaResponse findByName(@PathVariable String name) {
+        return mediaService.findByName(name);
+    }
+
+
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/multiple")
     public List<MediaResponse> upload(@RequestPart List<MultipartFile> files) {
