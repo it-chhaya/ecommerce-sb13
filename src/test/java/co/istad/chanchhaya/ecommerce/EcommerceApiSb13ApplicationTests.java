@@ -1,7 +1,7 @@
 package co.istad.chanchhaya.ecommerce;
 
-import co.istad.chanchhaya.ecommerce.entity.Category;
-import co.istad.chanchhaya.ecommerce.repository.CategoryRepository;
+import co.istad.chanchhaya.ecommerce.features.category.Category;
+import co.istad.chanchhaya.ecommerce.features.category.CategoryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
