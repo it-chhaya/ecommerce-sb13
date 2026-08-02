@@ -1,7 +1,7 @@
 package co.istad.chanchhaya.ecommerce.features.product.dto;
 
 import co.istad.chanchhaya.ecommerce.features.category.dto.CategoryResponse;
-import co.istad.chanchhaya.ecommerce.features.tag.TagResponse;
+import co.istad.chanchhaya.ecommerce.features.tag.dto.TagResponse;
 import lombok.Builder;
 
 import java.math.BigDecimal;
