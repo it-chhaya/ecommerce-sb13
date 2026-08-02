@@ -8,6 +8,13 @@ import java.util.List;
 
 public interface MediaService {
 
+
+    /**
+     * Delete media by name
+     */
+    void deleteByName(String name);
+
+
     /**
      * Find medias by pageable
      */

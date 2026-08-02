@@ -3,6 +3,7 @@ package co.istad.chanchhaya.ecommerce.controller;
 import co.istad.chanchhaya.ecommerce.dto.MediaResponse;
 import co.istad.chanchhaya.ecommerce.service.MediaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,21 @@ import java.util.List;
 public class MediaController {
 
     private final MediaService mediaService;
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{name}")
+    public void deleteByName(@PathVariable String name) {
+        mediaService.deleteByName(name);
+    }
+
+
+    @GetMapping
+    public Page<MediaResponse> findAll(
+            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(required = false, defaultValue = "25") int pageSize
+    ) {
+        return mediaService.findAll(pageNumber, pageSize);
+    }
 
 
     @GetMapping("/{name}")

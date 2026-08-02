@@ -7,6 +7,10 @@ import co.istad.chanchhaya.ecommerce.service.MediaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +43,42 @@ public class MediaServiceImpl implements MediaService {
 
 
     @Override
+    public void deleteByName(String name) {
+        Media media = mediaRepository.findByName(name)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Media has not been found"
+                        ));
+
+        // Delete from database
+        mediaRepository.delete(media);
+
+        // Delete from file system
+        Path path = Paths.get(buildMediaPath(mediaLocation, media.getName(), media.getExtension()));
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Something went wrong"
+            );
+        }
+    }
+
+
+    @Override
+    public Page<MediaResponse> findAll(int pageNumber, int pageSize) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        return mediaRepository
+                .findAll(pageable)
+                .map(this::buildMediaResponse);
+    }
+
+
+    @Override
     public MediaResponse findByName(String name) {
         Media media = mediaRepository.findByName(name)
                 .orElseThrow(() ->
@@ -66,7 +106,7 @@ public class MediaServiceImpl implements MediaService {
         // e.g. Vital.png
         int lastIndexDot = file.getOriginalFilename().lastIndexOf('.');
         String extension = file.getOriginalFilename().substring(lastIndexDot + 1);
-        Path path = Paths.get(mediaLocation + name + "." + extension);
+        Path path = Paths.get(buildMediaPath(mediaLocation, name, extension));
         log.info("Uploading media location: {}", path);
 
         // 2. Copy file
@@ -110,6 +150,12 @@ public class MediaServiceImpl implements MediaService {
                 mediaClientPath +
                 "/" + media.getName() +
                 "." + media.getExtension();
+    }
+
+    private String buildMediaPath(String mediaLocation,
+                                  String mediaName,
+                                  String mediaExtension) {
+        return mediaLocation + mediaName + "." + mediaExtension;
     }
 
 }
