@@ -10,6 +10,12 @@ public interface MediaService {
 
 
     /**
+     * Update media draft status = true (bin)
+     */
+    void draftByName(String name);
+
+
+    /**
      * Delete media by name
      */
     void deleteByName(String name);

@@ -43,6 +43,19 @@ public class MediaServiceImpl implements MediaService {
     private final static String MB = "MB";
 
 
+    @Override
+    public void draftByName(String name) {
+        Media media = mediaRepository.findByName(name)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Media has not been found"
+                        ));
+        media.setIsDraft(Boolean.TRUE);
+        mediaRepository.save(media);
+    }
+
+
     @Transactional
     @Override
     public void deleteByName(String name) {
@@ -52,6 +65,10 @@ public class MediaServiceImpl implements MediaService {
                                 HttpStatus.NOT_FOUND,
                                 "Media has not been found"
                         ));
+
+        if (!media.getIsDraft()) {
+            return;
+        }
 
         // Delete from database
         mediaRepository.delete(media);
@@ -75,7 +92,7 @@ public class MediaServiceImpl implements MediaService {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         return mediaRepository
-                .findAll(pageable)
+                .findByIsDraft(pageable, Boolean.FALSE)
                 .map(this::buildMediaResponse);
     }
 
@@ -92,6 +109,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
 
+    @Transactional
     @Override
     public List<MediaResponse> upload(List<MultipartFile> files) {
         return files.stream()
@@ -100,6 +118,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
 
+    @Transactional
     @Override
     public MediaResponse upload(MultipartFile file) {
         // TODO

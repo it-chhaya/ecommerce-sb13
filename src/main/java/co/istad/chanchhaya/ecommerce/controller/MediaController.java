@@ -17,6 +17,14 @@ public class MediaController {
 
     private final MediaService mediaService;
 
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/{name}/is-draft")
+    public void draftByName(@PathVariable String name) {
+        mediaService.draftByName(name);
+    }
+
+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{name}")
     public void deleteByName(@PathVariable String name) {
