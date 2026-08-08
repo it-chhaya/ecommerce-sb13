@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,6 +20,16 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     private final CategoryMapper categoryMapper;
+
+
+    @Override
+    public List<CategoryResponse> search(String name) {
+        return categoryRepository
+                .findByNameContainsIgnoreCase(name)
+                .stream()
+                .map(categoryMapper::mapCategoryToCategoryResponse)
+                .toList();
+    }
 
 
     @Override
