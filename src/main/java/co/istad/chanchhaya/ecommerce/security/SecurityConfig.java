@@ -2,9 +2,10 @@ package co.istad.chanchhaya.ecommerce.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -28,14 +29,18 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/scalar/**"
                         ).permitAll()
-                        .requestMatchers(
-                                "/api/v1/categories/**"
-                        ).permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/categories/**").hasAnyRole("STAFF", "ADMIN")
+
                         .anyRequest().authenticated()
         );
 
         // 3. Authentication Mechanism (HTTP Basic Authentication, JWT, OAuth2)
         http.httpBasic(Customizer.withDefaults());
+
+        // 4. Disable CSRF
+        http.csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
