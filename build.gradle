@@ -21,6 +21,7 @@ dependencies {
 
 	// Security dependency
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server'
 	testImplementation 'org.springframework.security:spring-security-test'
 
 	// Validation dependency

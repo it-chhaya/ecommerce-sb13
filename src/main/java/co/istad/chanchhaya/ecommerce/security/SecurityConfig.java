@@ -41,7 +41,11 @@ public class SecurityConfig {
         );
 
         // 3. Authentication Mechanism (HTTP Basic Authentication, JWT, OAuth2)
-        http.httpBasic(Customizer.withDefaults());
+        //http.httpBasic(Customizer.withDefaults());
+        http.oauth2ResourceServer(
+                oauth2 -> oauth2
+                .jwt(Customizer.withDefaults())
+        );
 
         // 4. Disable CSRF
         http.csrf(AbstractHttpConfigurer::disable);
