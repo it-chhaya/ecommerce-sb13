@@ -35,7 +35,7 @@ public class CategoryController {
     }
 
 
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Integer id) {
