@@ -41,7 +41,7 @@ public class SecurityConfig {
                                 "/scalar/**"
                         ).permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").hasAllAuthorities("category:read")
                         .requestMatchers(HttpMethod.POST, "/api/v1/categories/**").hasAnyAuthority("STAFF", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/categories/**").hasAnyAuthority("STAFF", "ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/categories/**").hasAnyAuthority("STAFF", "ADMIN")
@@ -72,11 +72,11 @@ public class SecurityConfig {
                 roles = realmAccess.get("roles");
             }
             return roles.stream()
-                    .map(role -> new SimpleGrantedAuthority(role))
+                    .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toSet());
         };
 
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        var jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(converter);
 
         return jwtAuthenticationConverter;
