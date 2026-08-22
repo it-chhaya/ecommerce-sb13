@@ -57,9 +57,7 @@ public class AuthServiceImpl implements AuthService {
         user.setEnabled(true);
 
         // Save into keycloak
-        UsersResource usersResource = keycloak.realm(realm).users();
-
-        try (Response response = usersResource.create(user)) {
+        try (Response response = getUsersResource().create(user)) {
             // TODO: failed (409, 401, 403, ...), succeed (201, 200, ...)
             log.info("Response status code: {}", response.getStatus());
             if (response.getStatus() == HttpStatus.FORBIDDEN.value()) {
@@ -74,32 +72,37 @@ public class AuthServiceImpl implements AuthService {
             }
             if (response.getStatus() == HttpStatus.CREATED.value()) {
                 log.info("User {} created successfully", user.getUsername());
-                assignGroups(user.getUsername(), usersResource);
+                assignRoles(user.getUsername());
+                assignGroups(user.getUsername());
             }
         }
     }
 
-    private void assignGroups(String username, UsersResource usersResource) {
-        UserRepresentation createdUser = usersResource
-                .search(username)
-                .getFirst();
-        UserResource keycloakUser = usersResource.get(createdUser.getId());
-        GroupsResource groupsResource = keycloak.realm(realm)
-                        .groups();
-        GroupRepresentation groupEcommerce = groupsResource.groups("Ecommerce", 0, 1)
+    private UsersResource getUsersResource() {
+        return keycloak.realm(realm).users();
+    }
+
+    private UserRepresentation getUser(String username) {
+        return getUsersResource().search(username).getFirst();
+    }
+
+    private void assignGroups(String username) {
+        UserRepresentation createdUser = getUser(username);
+        UserResource keycloakUser = getUsersResource().get(createdUser.getId());
+        GroupsResource groupsResource = keycloak.realm(realm).groups();
+        GroupRepresentation groupEcommerce = groupsResource
+                .groups("Ecommerce", 0, 1)
                 .getFirst();
         log.info("Group Id: {}", groupEcommerce.getId());
         keycloakUser.joinGroup(groupEcommerce.getId());
     }
 
-    private void assignRoles(String username, UsersResource usersResource) {
+    private void assignRoles(String username) {
         // Start assigning role (USER, CUSTOMER)
         // Load created user by username from Keycloak
-        UserRepresentation createdUser = usersResource
-                .search(username)
-                .getFirst();
+        UserRepresentation createdUser = getUser(username);
 
-        UserResource keycloakUser = usersResource.get(createdUser.getId());
+        UserResource keycloakUser = getUsersResource().get(createdUser.getId());
 
         // Create RoleRepresentation
         RolesResource rolesResource = keycloak.realm(realm).roles();
