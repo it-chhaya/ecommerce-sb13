@@ -1,12 +1,16 @@
 package co.istad.chanchhaya.ecommerce.features.auth;
 
 import co.istad.chanchhaya.ecommerce.features.auth.dto.RegisterRequest;
+import co.istad.chanchhaya.ecommerce.security.KeycloakRoleEnum;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RolesResource;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -51,14 +55,44 @@ public class AuthServiceImpl implements AuthService {
         user.setEnabled(true);
 
         // Save into keycloak
-        UsersResource usersResource = keycloak.realm(realm)
-                .users();
+        UsersResource usersResource = keycloak.realm(realm).users();
 
         try (Response response = usersResource.create(user)) {
             // TODO: failed (409, 401, 403, ...), succeed (201, 200, ...)
             log.info("Response status code: {}", response.getStatus());
+            if (response.getStatus() == HttpStatus.FORBIDDEN.value()) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+            if (response.getStatus() == HttpStatus.UNAUTHORIZED.value()) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            }
+            if (response.getStatus() == HttpStatus.CONFLICT.value()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Username or email already exists");
+            }
             if (response.getStatus() == HttpStatus.CREATED.value()) {
                 log.info("User {} created successfully", user.getUsername());
+                // Start assigning role (USER, CUSTOMER)
+                // Load created user by username from Keycloak
+                UserRepresentation createdUser = usersResource
+                        .search(user.getUsername())
+                        .getFirst();
+
+                UserResource keycloakUser = usersResource.get(createdUser.getId());
+
+                // Create RoleRepresentation
+                RolesResource rolesResource = keycloak.realm(realm).roles();
+                RoleRepresentation roleUser = rolesResource
+                        .get(KeycloakRoleEnum.USER.toString())
+                        .toRepresentation();
+                RoleRepresentation roleCustomer = rolesResource
+                        .get(KeycloakRoleEnum.CUSTOMER.toString())
+                        .toRepresentation();
+                List<RoleRepresentation> roles = List.of(roleUser, roleCustomer);
+
+                keycloakUser.roles()
+                        .realmLevel()
+                        .add(roles);
             }
         }
     }
