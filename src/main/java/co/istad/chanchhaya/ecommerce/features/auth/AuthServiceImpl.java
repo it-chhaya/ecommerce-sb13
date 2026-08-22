@@ -6,10 +6,12 @@ import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.GroupsResource;
 import org.keycloak.admin.client.resource.RolesResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
@@ -72,29 +74,46 @@ public class AuthServiceImpl implements AuthService {
             }
             if (response.getStatus() == HttpStatus.CREATED.value()) {
                 log.info("User {} created successfully", user.getUsername());
-                // Start assigning role (USER, CUSTOMER)
-                // Load created user by username from Keycloak
-                UserRepresentation createdUser = usersResource
-                        .search(user.getUsername())
-                        .getFirst();
-
-                UserResource keycloakUser = usersResource.get(createdUser.getId());
-
-                // Create RoleRepresentation
-                RolesResource rolesResource = keycloak.realm(realm).roles();
-                RoleRepresentation roleUser = rolesResource
-                        .get(KeycloakRoleEnum.USER.toString())
-                        .toRepresentation();
-                RoleRepresentation roleCustomer = rolesResource
-                        .get(KeycloakRoleEnum.CUSTOMER.toString())
-                        .toRepresentation();
-                List<RoleRepresentation> roles = List.of(roleUser, roleCustomer);
-
-                keycloakUser.roles()
-                        .realmLevel()
-                        .add(roles);
+                assignGroups(user.getUsername(), usersResource);
             }
         }
+    }
+
+    private void assignGroups(String username, UsersResource usersResource) {
+        UserRepresentation createdUser = usersResource
+                .search(username)
+                .getFirst();
+        UserResource keycloakUser = usersResource.get(createdUser.getId());
+        GroupsResource groupsResource = keycloak.realm(realm)
+                        .groups();
+        GroupRepresentation groupEcommerce = groupsResource.groups("Ecommerce", 0, 1)
+                .getFirst();
+        log.info("Group Id: {}", groupEcommerce.getId());
+        keycloakUser.joinGroup(groupEcommerce.getId());
+    }
+
+    private void assignRoles(String username, UsersResource usersResource) {
+        // Start assigning role (USER, CUSTOMER)
+        // Load created user by username from Keycloak
+        UserRepresentation createdUser = usersResource
+                .search(username)
+                .getFirst();
+
+        UserResource keycloakUser = usersResource.get(createdUser.getId());
+
+        // Create RoleRepresentation
+        RolesResource rolesResource = keycloak.realm(realm).roles();
+        RoleRepresentation roleUser = rolesResource
+                .get(KeycloakRoleEnum.USER.toString())
+                .toRepresentation();
+        RoleRepresentation roleCustomer = rolesResource
+                .get(KeycloakRoleEnum.CUSTOMER.toString())
+                .toRepresentation();
+        List<RoleRepresentation> roles = List.of(roleUser, roleCustomer);
+
+        keycloakUser.roles()
+                .realmLevel()
+                .add(roles);
     }
 
 }
