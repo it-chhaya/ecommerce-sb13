@@ -1,6 +1,8 @@
 package co.istad.chanchhaya.ecommerce.features.auth;
 
 import co.istad.chanchhaya.ecommerce.features.auth.dto.RegisterRequest;
+import co.istad.chanchhaya.ecommerce.features.userprofile.UserProfile;
+import co.istad.chanchhaya.ecommerce.features.userprofile.UserProfileRepository;
 import co.istad.chanchhaya.ecommerce.security.KeycloakRoleEnum;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ import java.util.List;
 public class AuthServiceImpl implements AuthService {
 
     private final Keycloak keycloak;
+    private final UserProfileRepository userProfileRepository;
 
     @Value("${keycloak.realm}")
     private String realm;
@@ -72,6 +75,10 @@ public class AuthServiceImpl implements AuthService {
             }
             if (response.getStatus() == HttpStatus.CREATED.value()) {
                 log.info("User {} created successfully", user.getUsername());
+
+                // Save into user_profiles table
+                saveUserProfile(user.getUsername());
+
                 assignRoles(user.getUsername());
                 assignGroups(user.getUsername());
             }
@@ -86,9 +93,17 @@ public class AuthServiceImpl implements AuthService {
         return getUsersResource().search(username).getFirst();
     }
 
+    private void saveUserProfile(String username) {
+        UserRepresentation createdUser = getUser(username);
+        UserProfile userProfile = new UserProfile();
+        userProfile.setId(createdUser.getId());
+        userProfileRepository.save(userProfile);
+    }
+
     private void assignGroups(String username) {
         UserRepresentation createdUser = getUser(username);
         UserResource keycloakUser = getUsersResource().get(createdUser.getId());
+
         GroupsResource groupsResource = keycloak.realm(realm).groups();
         GroupRepresentation groupEcommerce = groupsResource
                 .groups("Ecommerce", 0, 1)
