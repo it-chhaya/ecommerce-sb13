@@ -14,6 +14,8 @@ public interface UserProfileMapper {
     void toEntity(PatchUserProfileRequest patchUserProfileRequest,
                   @MappingTarget UserProfile userProfile);
 
-    UserProfileResponse toResponse(UserProfile userProfile);
+    UserProfileResponse toResponse(UserProfile userProfile,
+                                   String firstName,
+                                   String lastName);
 
 }
