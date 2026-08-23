@@ -5,6 +5,8 @@ import co.istad.chanchhaya.ecommerce.features.userprofile.dto.UserProfileRespons
 
 public interface UserProfileService {
 
+    UserProfileResponse getUserProfile();
+
     UserProfileResponse patchUserProfile(PatchUserProfileRequest patchUserProfileRequest);
 
 }

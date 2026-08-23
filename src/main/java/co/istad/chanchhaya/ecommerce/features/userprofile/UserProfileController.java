@@ -4,10 +4,7 @@ import co.istad.chanchhaya.ecommerce.features.userprofile.dto.PatchUserProfileRe
 import co.istad.chanchhaya.ecommerce.features.userprofile.dto.UserProfileResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/user-profiles")
@@ -15,6 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserProfileController {
 
     private final UserProfileService userProfileService;
+
+
+    @GetMapping
+    public UserProfileResponse getUserProfile() {
+        return userProfileService.getUserProfile();
+    }
+
 
     @PatchMapping
     public UserProfileResponse patchUserProfile(

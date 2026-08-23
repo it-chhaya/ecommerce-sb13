@@ -14,6 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,6 +29,27 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Value("${keycloak.realm}")
     private String realm;
+
+    @Override
+    public UserProfileResponse getUserProfile() {
+        // TODO
+        String userId = AuthUtils.extractUserId();
+        UserProfile userProfile = userProfileRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "User profile has not been found"
+                ));
+        UsersResource usersResource = keycloak.realm(realm).users();
+        UserResource userResource = usersResource.get(userId);
+        UserRepresentation userRepresentation = userResource.toRepresentation();
+
+        String phoneNumber = userRepresentation.getAttributes().get("phoneNumber").getFirst();
+
+        return userProfileMapper.toResponse(userProfile,
+                userRepresentation.getFirstName(),
+                userRepresentation.getLastName(),
+                phoneNumber);
+    }
 
     @Override
     public UserProfileResponse patchUserProfile(PatchUserProfileRequest patchUserProfileRequest) {
@@ -48,12 +73,18 @@ public class UserProfileServiceImpl implements UserProfileService {
             userRepresentation.setFirstName(patchUserProfileRequest.firstName());
         if (patchUserProfileRequest.lastName() != null)
             userRepresentation.setLastName(patchUserProfileRequest.lastName());
+        if (patchUserProfileRequest.phoneNumber() != null) {
+            Map<String, List<String>> attributes = new HashMap<>();
+            attributes.put("phoneNumber", List.of(patchUserProfileRequest.phoneNumber()));
+            userRepresentation.setAttributes(attributes);
+        }
 
         userResource.update(userRepresentation);
 
         return userProfileMapper.toResponse(userProfile,
-                patchUserProfileRequest.firstName(),
-                patchUserProfileRequest.lastName());
+                userRepresentation.getFirstName(),
+                userRepresentation.getLastName(),
+                userRepresentation.firstAttribute("phoneNumber"));
     }
 
 }

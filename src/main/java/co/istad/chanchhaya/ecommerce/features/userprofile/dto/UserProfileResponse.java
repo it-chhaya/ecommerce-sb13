@@ -4,6 +4,7 @@ public record UserProfileResponse(
         String id,
         String firstName,
         String lastName,
+        String phoneNumber,
         String gender,
         String biography,
         String facebookProfile,

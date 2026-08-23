@@ -16,6 +16,7 @@ public interface UserProfileMapper {
 
     UserProfileResponse toResponse(UserProfile userProfile,
                                    String firstName,
-                                   String lastName);
+                                   String lastName,
+                                   String phoneNumber);
 
 }
